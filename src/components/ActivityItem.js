@@ -1,14 +1,18 @@
 import { Card } from "antd"
 import { Link } from 'react-router-dom';
+import AddToPrefer from "./AddToPrefer"
 
 export default function ActivityItem({ activity }) {
     return (
-        <Card className="bg-gray activity">
+        <Card
+            hoverable
+            className="bg-gray activity">
             <Link to={`/activity/${activity.id}`}>
                 <img
                     style={{ width: '100%' }}
                     src={activity.image}
-                    alt={activity.name} />
+                    alt={activity.name}
+                    className="activityItem-img" />
             </Link>
             <div className="activity-info">
                 <h6 className="activity-category">
@@ -17,17 +21,19 @@ export default function ActivityItem({ activity }) {
                 <h2 className="activity-name">
                     {activity.name}
                 </h2>
-                {/* <p className="activity-description">
-                    {activity.description}
-                </p> */}
                 <div className="activity-more">
-                    <Link to={`/activity/${activity.id}`} className="activity-link">
-                        See More ...
+                    <Link to={`/activity/${activity.id}`} className="activity-link link">
+                        抗抗更多⋯⋯
                     </Link>
-                    {/* <span
-                        className="text-gray">
-                        USD {activity.price}.00
-                    </span> */}
+                    <AddToPrefer activity={activity} />
+                    {/* <Button 
+                        type="text" 
+                        style={{color:"#eb2f96"}}
+                        icon={<HeartTwoTone />} 
+                        size="large"
+                        className="activity-icon">
+                    </Button> */}
+                    {/* <HeartTwoTone twoToneColor="#eb2f96" className="activity-icon" /> */}
                 </div>
             </div>
         </Card>

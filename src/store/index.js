@@ -1,76 +1,79 @@
 import { createContext, useReducer } from "react";
-import activitys from "../json/activity.json"
+import useReducerWithThunk from "use-reducer-thunk";
+import activities from "../json/activity.json"
+import Cookie from "js-cookie";
+
 import { 
-   PAGE_TITLE_SET,
-   PAGE_CONTENT_SET,
-   NAVBAR_ITEM_SET,
+   PREFER_ADD_ITEM,
+   PREFER_REMOVE_ITEM, 
    CART_ADD_ITEM,
-   CART_REMOVE_ITEM, 
+   CART_REMOVE_ITEM,
+   SET_ACTIVITY_DETAIL,
 } from "../utils/constants"
 
 export const StoreContext = createContext();
+let preferItems = Cookie.getJSON("preferItems");
+if(!preferItems) preferItems = []; 
+let cartItems = Cookie.getJSON("cartItems");
+if(!cartItems) cartItems = []; 
 
 const initialState = {
    page: {
-      title: "NORDIC NEST Shopping Cart",
-      activitys,
+      title: "Rock Bae",
+      activities,
    },
    navBar: {
       activeItem: "",
    },
-   cartItems: [],
+   preferItems,
+   cartItems,
 };
-
-let cartItems = {};
 
 function reducer(state, action) {
    switch (action.type) {
-      case PAGE_TITLE_SET:
-         return {
-            ...state,
-            page: {
-               ...state.page,
-               title: action.payload,
-            },
-         };
-      case PAGE_CONTENT_SET:
-         return {
-            ...state,
-            page: {
-               ...state.page,
-               activitys: action.payload,
-            },
-         };
-      case NAVBAR_ITEM_SET:
-         return {
-            ...state,
-            navBar: {
-               activeItem: action.payload
-            }
-         };
-      case CART_ADD_ITEM:
+      case PREFER_ADD_ITEM:
          const item = action.payload;
-         const activity = state.cartItems.find((x) => x.id === item.id);
+         const activity = state.preferItems.find((x) => x.id === item.id);
          if (activity) {
-            cartItems = state.cartItems.map((x) =>
+            preferItems = state.preferItems.map((x) =>
                x.id === activity.id ? item : x
             );
-            return { ...state, cartItems };
+            return { ...state, preferItems };
          }
-         cartItems = [...state.cartItems, item];
-         return { ...state, cartItems };
-      case CART_REMOVE_ITEM:
-         cartItems = state.cartItems.filter((x) => x.id !== action.payload);
-         return { ...state, cartItems };
+         preferItems = [...state.preferItems, item];
+         return { ...state, preferItems };
+      case PREFER_REMOVE_ITEM:
+         preferItems = state.preferItems.filter((x) => x.id !== action.payload);
+         return { ...state, preferItems };
+      case CART_ADD_ITEM:
+            const item1 = action.payload;
+            const activity1 = state.cartItems.find((x) => x.id === item1.id);
+            if (activity1) {
+               cartItems = state.cartItems.map((x) =>
+                  x.id === activity1.id ? item1 : x
+               );
+               return { ...state, cartItems };
+            }
+            cartItems = [...state.cartItems, item1];
+            return { ...state, cartItems };
+         case CART_REMOVE_ITEM:
+            cartItems = state.cartItems.filter((x) => x.id !== action.payload);
+            return { ...state, cartItems };   
+         case SET_ACTIVITY_DETAIL:
+            return { ...state, activityDetail: { ...state.activityDetail, ...action.payload} };   
       default:
          return state;
    }
 }
 
 export function StoreProvider(props) {
-   const [state, dispatch] = useReducer(reducer, initialState);
+   // const [state, dispatch] = useReducer(reducer, initialState);
+   const [state, dispatch] = useReducerWithThunk(
+      reducer,
+      initialState,
+      "example"
+    );
    const value = { state, dispatch };
-
    return (
       <StoreContext.Provider value={value}>
          {props.children}
